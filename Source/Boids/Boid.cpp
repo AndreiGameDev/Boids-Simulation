@@ -16,6 +16,7 @@ ABoid::ABoid()
 
 	Mesh->SetStaticMesh(SphereMesh);
 	this->SetRootComponent(Mesh);
+	//BoidManager->FindComponentByClass<ABoidManager>();
 }
 
 // Called when the game starts or when spawned
@@ -29,32 +30,14 @@ FVector ABoid::Seek(FVector Position)
 {
 	FVector NewVelocity = Position - GetActorLocation();
 	NewVelocity.Normalize();
-	return FVector();
+    return NewVelocity;
 }
 
 FVector ABoid::Flee(FVector Position)
 {
 	FVector NewVelocity = GetActorLocation() - Position;
 	NewVelocity.Normalize();
-	return FVector();
-}
-
-FVector ABoid::ClosestBoidPosition(ABoid* ThisBoid)
-{
-	float ClosestDistannce = ABoidManager::MaxFleeDistance;
-	FVector ReturnVal = FVector::ZeroVector;
-
-	for (ABoid* Boid : ABoidManager::MyBoids) {
-		if (Boid == this || !Boid || Boid == ABoidManager::LastTagged) {
-			continue;
-		}
-		float ADistance = (Boid->GetActorLocation() - ThisBoid->GetActorLocation()).Size();
-		if (ADistance < ClosestDistannce) {
-			ClosestDistannce = ADistance;
-			ReturnVal = Boid->GetActorLocation();
-		}
-	}
-	return FVector();
+    return NewVelocity;
 }
 
 // Called every frame
@@ -66,16 +49,32 @@ void ABoid::Tick(float DeltaTime)
 
 void ABoid::UpdateBoid(float DeltaTime)
 {
-	FVector TargetVelocity = FVector::ZeroVector;
+    if (WaitCounter > 0)
+    {
+        WaitCounter -= DeltaTime;
+        return; // Skip updating if waiting
+    }
 
-	// Find Velocity
+    FVector TargetVelocity = FVector::ZeroVector;
 
-	FVector NewForce = TargetVelocity - CurrentVelocity;
-	CurrentVelocity += NewForce + DeltaTime;
+    FVector ClosestBoidPos = BoidManager->ClosestBoidPosition(this);
+    if (BoidManager->TaggedBoid == this) // Chase
+    {
+        TargetVelocity = Seek(ClosestBoidPos);
+        TargetVelocity *= BoidManager->ChaseMultiplier;
+    }
+    else // Flee
+    {
+        TargetVelocity = Flee(ClosestBoidPos);
+    }
 
-	FVector Location = GetActorLocation();
-	Location += (CurrentVelocity * Speed * DeltaTime);
+    FVector NewForce = TargetVelocity - CurrentVelocity;
+    CurrentVelocity += NewForce * DeltaTime;
 
-	SetActorLocation(Location);
+    FVector Location = GetActorLocation();
+    Location += (CurrentVelocity * Speed * DeltaTime);
+
+    SetActorLocation(Location);
 }
+
 

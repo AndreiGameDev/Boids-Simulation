@@ -21,14 +21,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	float SpawnRadius = 500.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float MaxFleeDistance = 5000.0f;
 
-	static float MaxFleeDistance = 1000.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float ChaseMultiplier = 2.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float CatchRange = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float TimeoutTime = 5.0f;
+
 
 	USceneComponent* Transform;
 
-	static TArray<class ABoid*> MyBoids;
-	static ABoid* LastTagged;
-	static ABoid* TaggedBoid;
+	TArray<class ABoid*> MyBoids;
+	ABoid* LastTagged;
+	ABoid* TaggedBoid;
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,5 +47,5 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	static FVector ClosestBoidPosition(ABoid* ThisBoid);
+	FVector ClosestBoidPosition(ABoid* ThisBoid);
 };

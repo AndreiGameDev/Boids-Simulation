@@ -3,6 +3,9 @@
 
 #include "BoidManager.h"
 #include "Boid.h"
+
+
+
 // Sets default values
 ABoidManager::ABoidManager()
 {
@@ -17,16 +20,19 @@ ABoidManager::ABoidManager()
 void ABoidManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	for (int i = 0; i < SpawnCount; i++) {
 		FVector SpawnLocation = (FMath::VRand() * SpawnRadius) + GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
 
 		ABoid* NewBoid = GetWorld()->SpawnActor<ABoid>(SpawnLocation, SpawnRotation);
+		NewBoid->BoidManager = this;
 		MyBoids.Add(NewBoid);
 	}
-	TaggedBoid = MyBoids[0];
+
+		TaggedBoid = MyBoids[0];
 }
+
 
 // Called every frame
 void ABoidManager::Tick(float DeltaTime)
@@ -36,4 +42,37 @@ void ABoidManager::Tick(float DeltaTime)
 		Boid->UpdateBoid(DeltaTime);
 	}
 }
+
+FVector ABoidManager::ClosestBoidPosition(ABoid* ThisBoid)
+{
+
+    float ClosestDistance = MaxFleeDistance;
+    FVector ReturnVal = FVector::ZeroVector;
+
+    for (ABoid* Boid : MyBoids)
+    {
+        if (Boid == ThisBoid || Boid == LastTagged)
+        {
+            continue;
+        }
+
+        float Distance = (Boid->GetActorLocation() - ThisBoid->GetActorLocation()).Size();
+        if (Distance < ClosestDistance)
+        {
+            ClosestDistance = Distance;
+            ReturnVal = Boid->GetActorLocation();
+        }
+
+        if (ThisBoid == TaggedBoid && ClosestDistance < CatchRange)
+        {
+            LastTagged = TaggedBoid;
+            TaggedBoid = Boid;
+            TaggedBoid->WaitCounter = TimeoutTime;
+        }
+    }
+
+    return ReturnVal;
+}
+
+
 

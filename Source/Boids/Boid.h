@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Boid.generated.h"
 
+class ABoidManager;
+
 UCLASS()
 class BOIDS_API ABoid : public AActor
 {
@@ -16,16 +18,19 @@ class BOIDS_API ABoid : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABoid();
+	ABoidManager* BoidManager;
+	float WaitCounter = 0;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	FVector Seek(FVector Position);
 	FVector Flee(FVector Position);
-	FVector ClosestBoidPosition(ABoid* ThisBoid);
 
 	UStaticMeshComponent* Mesh;
-	float Speed = 10;
+	
+	float Speed = 100;
+
 
 public:	
 	// Called every frame
