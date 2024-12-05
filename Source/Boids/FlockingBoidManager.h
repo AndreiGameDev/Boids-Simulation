@@ -1,0 +1,48 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "FlockingBoidManager.generated.h"
+
+UCLASS()
+class BOIDS_API AFlockingBoidManager : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AFlockingBoidManager();
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	int SpawnCount = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float SpawnRadius = 500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float NeighbourRadius = 900.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float SeparationWeight = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float CohesionWeight = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	float AllignmentWeight = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TSubclassOf<class AFlockingBoid> BBoid;
+
+	TArray<class AFlockingBoid*> MyBoids;
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	TArray<class AFlockingBoid*> GetBoidNeighbourhood(class AFlockingBoid* ThisBoid);
+};
