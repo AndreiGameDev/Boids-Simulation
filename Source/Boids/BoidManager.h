@@ -33,8 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	float TimeoutTime = 5.0f;
 
-
-	USceneComponent* Transform;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TSubclassOf<class ABoid> BBoid;
 
 	TArray<class ABoid*> MyBoids;
 	ABoid* LastTagged;

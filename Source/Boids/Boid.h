@@ -18,7 +18,9 @@ class BOIDS_API ABoid : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABoid();
+
 	ABoidManager* BoidManager;
+
 	float WaitCounter = 0;
 
 protected:
@@ -26,8 +28,6 @@ protected:
 	virtual void BeginPlay() override;
 	FVector Seek(FVector Position);
 	FVector Flee(FVector Position);
-
-	UStaticMeshComponent* Mesh;
 	
 	float Speed = 100;
 

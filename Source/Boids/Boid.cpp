@@ -10,13 +10,6 @@ ABoid::ABoid()
 	FVector TargetVelocity = FVector::ZeroVector;
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
-	UStaticMesh* SphereMesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh '/Engine/BasicShapes/Sphere.Sphere'")).Object;
-
-	Mesh->SetStaticMesh(SphereMesh);
-	this->SetRootComponent(Mesh);
-	//BoidManager->FindComponentByClass<ABoidManager>();
 }
 
 // Called when the game starts or when spawned

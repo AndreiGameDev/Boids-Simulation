@@ -11,9 +11,6 @@ ABoidManager::ABoidManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Transform = CreateDefaultSubobject<USceneComponent>("Root Scene Component");
-	this->SetRootComponent(Transform);
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +22,7 @@ void ABoidManager::BeginPlay()
 		FVector SpawnLocation = (FMath::VRand() * SpawnRadius) + GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
 
-		ABoid* NewBoid = GetWorld()->SpawnActor<ABoid>(SpawnLocation, SpawnRotation);
+		ABoid* NewBoid = GetWorld()->SpawnActor<ABoid>(BBoid, SpawnLocation, SpawnRotation);
 		NewBoid->BoidManager = this;
 		MyBoids.Add(NewBoid);
 	}
