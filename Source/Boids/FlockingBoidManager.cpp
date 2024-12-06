@@ -16,7 +16,7 @@ void AFlockingBoidManager::BeginPlay()
 {
 	Super::BeginPlay();
 	for (int i = 0; i < SpawnCount; i++) {
-		FVector SpawnLocation = (FMath::VRand() + FMath::RandRange(0.0f, SpawnRadius)) + GetActorLocation();
+		FVector SpawnLocation = (FMath::VRand() * FMath::RandRange(0.0f, SpawnRadius)) + GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
 
 		AFlockingBoid* NewBoid = GetWorld()->SpawnActor<AFlockingBoid>(BBoid, SpawnLocation, SpawnRotation);

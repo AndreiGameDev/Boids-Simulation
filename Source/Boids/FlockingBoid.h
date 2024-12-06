@@ -32,8 +32,9 @@ protected:
 	FVector Alignment(TArray<AFlockingBoid*> Neighbours);
 	FVector Cohesion(TArray<AFlockingBoid*> Neighbours);
 	FVector Sepparation(TArray<AFlockingBoid*> Neighbours);
-
-	float Speed = 100;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
+	float Speed = 100.0f;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
