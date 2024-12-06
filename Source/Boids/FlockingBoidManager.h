@@ -15,25 +15,25 @@ public:
 	// Sets default values for this actor's properties
 	AFlockingBoidManager();
 
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	int SpawnCount = 30;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	float SpawnRadius = 500.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flocking Settings")
 	float NeighbourRadius = 900.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flocking Settings")
 	float SeparationWeight = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flocking Settings")
 	float CohesionWeight = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flocking Settings")
 	float AllignmentWeight = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	TSubclassOf<class AFlockingBoid> BBoid;
 
 	TArray<class AFlockingBoid*> MyBoids;
