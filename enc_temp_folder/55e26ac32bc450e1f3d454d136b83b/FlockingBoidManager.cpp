@@ -11,7 +11,6 @@ AFlockingBoidManager::AFlockingBoidManager()
 
 }
 
-
 // Called when the game starts or when spawned
 void AFlockingBoidManager::BeginPlay()
 {
@@ -57,25 +56,30 @@ TArray<class AFlockingBoid*> AFlockingBoidManager::GetBoidNeighbourhood(AFlockin
 	return ReturnBoids;
 }
 
-FVector AFlockingBoidManager::GetClosestBoidPosition(AFlockingBoid* ThisBoid, bool bDebugPrint)
+FVector AFlockingBoidManager::GetClosestBoidPosition(AFlockingBoid* ThisBoid)
 {
     FVector ReturnVal = FVector::ZeroVector;
-    float ClosestDistance = FLT_MAX;
+    float ClosestDistance = 0.0f;
     FString BoidName = "";
+    FString ClosestBoidName = "";
     for (AFlockingBoid* Boid : MyBoids) {
         if (Boid == ThisBoid || Boid == NULL ) {
             continue;
         }
+
         float DistanceToBoid = (ThisBoid->GetActorLocation() - Boid->GetActorLocation()).Size();
+        /*UE_LOG(LogTemp, Warning, TEXT("Boid: %s, Distance: %f"), *Boid->GetName(), DistanceToBoid);*/
         if (DistanceToBoid < ClosestDistance) {
             ClosestDistance = DistanceToBoid;
             ReturnVal = Boid->GetActorLocation();
-            BoidName = *Boid->GetName();
+            BoidName = Boid->GetName(); // Correctly assign the FString
+            ClosestBoidName = BoidName;
         }
     }
-    if (bDebugPrint) {
-        UE_LOG(LogTemp, Warning, TEXT("%s is seeking %s"),*ThisBoid->GetName(), *BoidName);
-    }
-    
+
+    // WHY DOESN'T THIS LOG????
+    UE_LOG(LogTemp, Warning, TEXT("This is the vector: X=%f Y=%f Z=%f"), ReturnVal.X, ReturnVal.Y, ReturnVal.Z);
+    UE_LOG(LogTemp, Warning, TEXT("This is the boid being seeked to: %s"), *ClosestBoidName);
     return ReturnVal;
 }
+

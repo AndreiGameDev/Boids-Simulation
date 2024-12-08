@@ -14,7 +14,6 @@ class BOIDS_API AFlockingBoidManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AFlockingBoidManager();
-	
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	int SpawnCount = 30;
@@ -37,7 +36,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	TSubclassOf<class AFlockingBoid> BBoid;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	TArray<class AFlockingBoid*> MyBoids;
 protected:
 	// Called when the game starts or when spawned
@@ -47,6 +45,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	TArray<class AFlockingBoid*> GetBoidNeighbourhood(class AFlockingBoid* ThisBoid);
-	FVector GetClosestBoidPosition(class AFlockingBoid* ThisBoid, bool bDebugPrint = false);
+	FVector GetClosestBoidPosition(class AFlockingBoid* ThisBoid);
 
 };

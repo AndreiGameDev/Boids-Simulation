@@ -100,6 +100,7 @@ FVector AFlockingBoid::Wander(float Radius, float Distance, float Jitter)
     FVector JitterDestination = Seek(WanderDestination) + (FMath::VRand() * FMath::RandRange(0.0f, Jitter));
     return JitterDestination;
 }
+
 void AFlockingBoid::UpdateBoid(float DeltaTime)
 {
     FVector TargetVelocity = FVector::ZeroVector;
@@ -108,7 +109,11 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
 
     // If there is no neighbourhood then seek for one
     if (BoidNeighbourhood.Num() == 0) {
-        TargetVelocity += Seek(FlockingBoidManager->GetClosestBoidPosition(this, true));
+        TargetVelocity += Seek(FlockingBoidManager->GetClosestBoidPosition(this));
+        UE_LOG(LogTemp, Warning, 
+            TEXT("%s Goint to seek position for the closest boid near them at position: %s"),
+            *GetName(),
+            *Seek(FlockingBoidManager->GetClosestBoidPosition(this)).ToString());
     } else { // Else normal steering behaviour inside neighbourhood
         TargetVelocity += Sepparation(BoidNeighbourhood) * FlockingBoidManager->SeparationWeight;
         TargetVelocity += Cohesion(BoidNeighbourhood) * FlockingBoidManager->CohesionWeight;
@@ -127,11 +132,6 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
 
     FVector Location = GetActorLocation();
     Location += (CurrentVelocity * Speed * DeltaTime);
-    SetActorLocation(Location);
 
-    if (!CurrentVelocity.IsNearlyZero()) // Avoid rotating when velocity is zero
-    {
-        FRotator NewRotation = CurrentVelocity.Rotation();
-        SetActorRotation(NewRotation);
-    }
+    SetActorLocation(Location);
 }
