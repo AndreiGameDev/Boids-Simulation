@@ -6,6 +6,41 @@
 #include "GameFramework/Actor.h"
 #include "FlockingBoidManager.generated.h"
 
+USTRUCT(BlueprintType)
+struct FBoidManagerProperties
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	int SpawnCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float SpawnRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float NeighbourRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float SeparationWeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float CohesionWeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float AllignmentWeight;
+
+	// Default constructor for initialization
+	FBoidManagerProperties()
+		: SpawnCount(30)
+		, SpawnRadius(500.0f)
+		, NeighbourRadius(900.0f)
+		, SeparationWeight(1.0f)
+		, CohesionWeight(1.0f)
+		, AllignmentWeight(1.0f)
+	{
+	}
+};
+
 
 UCLASS()
 class BOIDS_API AFlockingBoidManager : public AActor
@@ -47,6 +82,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
 	float EdgeThreshold = 100.0f;                     // Threshold for edge avoidance
 	
+
+	UFUNCTION(BlueprintCallable, Category = "Boid Manager Settings", meta = (DisplayName = "Set Boid Manager Properties Struct", ToolTip = "Sets all boid manager properties using a single struct."))
+	void SetProperties(const FBoidManagerProperties& NewProperties);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Boid Manager Settings", meta = (DisplayName = "Get Boid Manager Properties Struct", ToolTip = "Gets all boid manager properties using a single struct."))
+	FBoidManagerProperties GetProperties();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,3 +100,6 @@ public:
 	FVector GetClosestBoidPosition(class AFlockingBoid* ThisBoid, bool bDebugPrint = false);
 
 };
+
+
+

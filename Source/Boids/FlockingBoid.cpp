@@ -93,7 +93,23 @@ FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVec
 void AFlockingBoid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+    //Debugging neighbour area
+    if (bHasNeighbourhood) {
+        DrawDebugSphere(GetWorld(),
+            GetActorLocation(),
+            FlockingBoidManager->NeighbourRadius,
+            8,
+            FColor::Green,
+            false, -1.0f, 0, 1.0f ); 
+    } else {
+        DrawDebugSphere(GetWorld(),
+            GetActorLocation(),
+            FlockingBoidManager->NeighbourRadius,
+            8,
+            FColor::Red,
+            false, -1.0f, 0, 1.0f);
+    }
+    
 }
 FVector AFlockingBoid::Seek(FVector Position)
 {
@@ -127,21 +143,39 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
 
     TArray<AFlockingBoid*> BoidNeighbourhood = FlockingBoidManager->GetBoidNeighbourhood(this);
 
-    // If there is no neighbourhood then seek for one
-    if (BoidNeighbourhood.Num() == 0) {
-        TargetVelocity += Seek(FlockingBoidManager->GetClosestBoidPosition(this, true));
-    } else { // Else normal steering behaviour inside neighbourhood
-        TargetVelocity += Sepparation(BoidNeighbourhood) * FlockingBoidManager->SeparationWeight;
-        TargetVelocity += Cohesion(BoidNeighbourhood) * FlockingBoidManager->CohesionWeight;
-        TargetVelocity += Alignment(BoidNeighbourhood) * FlockingBoidManager->AllignmentWeight;
+    // Gonna leave this commented as I am experimenting
+    //// If there is no neighbourhood then seek for one
+    //if (BoidNeighbourhood.Num() == 0) {
+    //    TargetVelocity += Seek(FlockingBoidManager->GetClosestBoidPosition(this, true));
+    //} else { // Else normal steering behaviour inside neighbourhood
+    //    TargetVelocity += Sepparation(BoidNeighbourhood) * FlockingBoidManager->SeparationWeight;
+    //    TargetVelocity += Cohesion(BoidNeighbourhood) * FlockingBoidManager->CohesionWeight;
+    //    TargetVelocity += Alignment(BoidNeighbourhood) * FlockingBoidManager->AllignmentWeight;
 
+    //    TargetVelocity.Normalize();
+    //    
+    //    //Wanders
+    //    if (TargetVelocity.Size() < 1.0f) {
+    //        TargetVelocity += Wander(100.0f, 200.0f, 50.0f);
+    //        TargetVelocity.Normalize();
+    //    }
+    //}
+    if (BoidNeighbourhood.Num() > 0) {
+        bHasNeighbourhood = true;
+    }
+    else {
+        bHasNeighbourhood = false;
+    }
+    TargetVelocity += Sepparation(BoidNeighbourhood) * FlockingBoidManager->SeparationWeight;
+    TargetVelocity += Cohesion(BoidNeighbourhood) * FlockingBoidManager->CohesionWeight;
+    TargetVelocity += Alignment(BoidNeighbourhood) * FlockingBoidManager->AllignmentWeight;
+
+    TargetVelocity.Normalize();
+
+    //Wanders
+    if (TargetVelocity.Size() < 1.0f) {
+        TargetVelocity += Wander(100.0f, 200.0f, 50.0f);
         TargetVelocity.Normalize();
-        
-        //Wanders
-        if (TargetVelocity.Size() < 1.0f) {
-            TargetVelocity += Wander(100.0f, 200.0f, 50.0f);
-            TargetVelocity.Normalize();
-        }
     }
 
     // Constrain boid within the sphere

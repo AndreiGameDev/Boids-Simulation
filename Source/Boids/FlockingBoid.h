@@ -14,7 +14,7 @@ class BOIDS_API AFlockingBoid : public AActor
 	GENERATED_BODY()
 	
 	FVector CurrentVelocity = FVector::ZeroVector;
-
+	bool bHasNeighbourhood = false;
 public:	
 	// Sets default values for this actor's properties
 	AFlockingBoid();

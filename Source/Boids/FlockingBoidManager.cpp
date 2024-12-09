@@ -36,7 +36,7 @@ void AFlockingBoidManager::Tick(float DeltaTime)
     // Draws the edge of the sphere
     DrawDebugSphere(GetWorld(),
         SphereCenter,
-        SphereRadius - EdgeThreshold,
+        SphereRadius,
         32,
         FColor::Blue,
         false, -1.0f, 0, 1.0f
@@ -72,8 +72,31 @@ TArray<class AFlockingBoid*> AFlockingBoidManager::GetBoidNeighbourhood(AFlockin
             ReturnBoids.Add(Boid);
         }
 	}
-
 	return ReturnBoids;
+}
+
+void AFlockingBoidManager::SetProperties(const FBoidManagerProperties& NewProperties)
+{
+    SpawnCount = NewProperties.SpawnCount;
+    SpawnRadius = NewProperties.SpawnRadius;
+    NeighbourRadius = NewProperties.NeighbourRadius;
+    SeparationWeight = NewProperties.SeparationWeight;
+    CohesionWeight = NewProperties.CohesionWeight;
+    AllignmentWeight = NewProperties.AllignmentWeight;
+}
+
+FBoidManagerProperties AFlockingBoidManager::GetProperties()
+{
+    FBoidManagerProperties Properties;
+
+    Properties.SpawnCount = SpawnCount;
+    Properties.SpawnRadius = SpawnRadius;
+    Properties.NeighbourRadius = NeighbourRadius;
+    Properties.SeparationWeight = SeparationWeight;
+    Properties.CohesionWeight = CohesionWeight;
+    Properties.AllignmentWeight = AllignmentWeight;
+
+    return Properties;
 }
 
 FVector AFlockingBoidManager::GetClosestBoidPosition(AFlockingBoid* ThisBoid, bool bDebugPrint)

@@ -32,4 +32,5 @@ class BOIDS_API UBoidFunctionLibrary : public UBlueprintFunctionLibrary
 		Category = "BoidLibrary|Math"
 	)
 	static FVector Flee(FVector ActorPosition, FVector TargetPosition);
+
 };

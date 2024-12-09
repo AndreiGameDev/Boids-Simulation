@@ -2,7 +2,7 @@
 
 
 #include "BoidFunctionLibrary.h"
-
+#include "Logging/StructuredLog.h"
 
 FVector UBoidFunctionLibrary::Seek(FVector ActorPosition, FVector TargetPosition)
 {
