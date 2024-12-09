@@ -3,6 +3,8 @@
 
 #include "FlockingBoidManager.h"
 #include "FlockingBoid.h"
+
+
 // Sets default values
 AFlockingBoidManager::AFlockingBoidManager()
 {
@@ -31,6 +33,23 @@ void AFlockingBoidManager::BeginPlay()
 void AFlockingBoidManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+    // Draws the edge of the sphere
+    DrawDebugSphere(GetWorld(),
+        SphereCenter,
+        SphereRadius - EdgeThreshold,
+        32,
+        FColor::Blue,
+        false, -1.0f, 0, 1.0f
+    );
+    // Draws the sphere of how far from the edge the boids should turn
+    DrawDebugSphere(GetWorld(),               
+        SphereCenter,             
+        SphereRadius - EdgeThreshold,             
+        32,                       
+        FColor::Yellow,             
+        false,-1.0f,0,1.0f                      
+    );
+
 	for (AFlockingBoid* Boid : MyBoids) {
 		Boid->UpdateBoid(DeltaTime);
 	}

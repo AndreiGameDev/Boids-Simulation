@@ -32,6 +32,7 @@ protected:
 	FVector Alignment(TArray<AFlockingBoid*> Neighbours);
 	FVector Cohesion(TArray<AFlockingBoid*> Neighbours);
 	FVector Sepparation(TArray<AFlockingBoid*> Neighbours);
+	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")

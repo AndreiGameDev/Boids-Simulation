@@ -3,7 +3,7 @@
 
 #include "FlockingBoid.h"
 #include "FlockingBoidManager.h"
-
+#include "Logging/StructuredLog.h"
 // Sets default values
 AFlockingBoid::AFlockingBoid()
 {
@@ -68,6 +68,27 @@ FVector AFlockingBoid::Sepparation(TArray<AFlockingBoid*> Neighbours)
     return FleePoint;
 }
 
+FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold)
+{
+    FVector ToCenter = SphereCenter - GetActorLocation();
+    float DistanceToCenter = ToCenter.Size();
+
+    // If the boid is outside the sphere
+    if (DistanceToCenter > SphereRadius)
+    {
+        FVector CorrectionForce = ToCenter.GetSafeNormal() * (DistanceToCenter - SphereRadius);
+        CurrentActorVelocity += CorrectionForce; // Push back towards center
+    }
+    // If boid is near the edge of the sphere
+    else if (SphereRadius - DistanceToCenter < EdgeThreshold)
+    {
+        FVector AvoidEdgeForce = ToCenter.GetSafeNormal() * (EdgeThreshold - (SphereRadius - DistanceToCenter));
+        CurrentActorVelocity += AvoidEdgeForce; // Gently steer away from edge
+    }
+
+    return CurrentActorVelocity.GetClampedToMaxSize(Speed);
+}
+
 // Called every frame
 void AFlockingBoid::Tick(float DeltaTime)
 {
@@ -115,13 +136,17 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
         TargetVelocity += Alignment(BoidNeighbourhood) * FlockingBoidManager->AllignmentWeight;
 
         TargetVelocity.Normalize();
+        
+        //Wanders
         if (TargetVelocity.Size() < 1.0f) {
             TargetVelocity += Wander(100.0f, 200.0f, 50.0f);
             TargetVelocity.Normalize();
         }
     }
 
-    
+    // Constrain boid within the sphere
+    TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
+
     FVector NewForce = TargetVelocity - CurrentVelocity;
     CurrentVelocity += NewForce * DeltaTime;
 

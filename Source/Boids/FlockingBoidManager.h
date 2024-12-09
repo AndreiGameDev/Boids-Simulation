@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "FlockingBoidManager.generated.h"
 
+
 UCLASS()
 class BOIDS_API AFlockingBoidManager : public AActor
 {
@@ -39,6 +40,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	TArray<class AFlockingBoid*> MyBoids;
+
+	FVector SphereCenter = GetActorLocation(); // Center of the sphere
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
+	float SphereRadius = 1000.0f;                     // Radius of the sphere
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
+	float EdgeThreshold = 100.0f;                     // Threshold for edge avoidance
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
