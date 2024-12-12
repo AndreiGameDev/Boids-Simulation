@@ -15,11 +15,16 @@ class BOIDS_API AFlockingBoid : public AActor
 	
 	FVector CurrentVelocity = FVector::ZeroVector;
 	bool bHasNeighbourhood = false;
+
+	
 public:	
 	// Sets default values for this actor's properties
 	AFlockingBoid();
 
 	AFlockingBoidManager* FlockingBoidManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	float SeparationValue = 100.0f;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,6 +37,7 @@ protected:
 	FVector Alignment(TArray<AFlockingBoid*> Neighbours);
 	FVector Cohesion(TArray<AFlockingBoid*> Neighbours);
 	FVector Sepparation(TArray<AFlockingBoid*> Neighbours);
+	void BoidSteering(TArray<AFlockingBoid*> Neighbours, float DeltaTime);
 	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
 
 
