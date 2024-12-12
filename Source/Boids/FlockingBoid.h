@@ -33,11 +33,6 @@ protected:
 
 	FVector Wander(float Radius, float Distance, float Jitter);
 	FVector WanderDestination;
-
-	FVector Alignment(TArray<AFlockingBoid*> Neighbours);
-	FVector Cohesion(TArray<AFlockingBoid*> Neighbours);
-	FVector Sepparation(TArray<AFlockingBoid*> Neighbours);
-	void BoidSteering(TArray<AFlockingBoid*> Neighbours, float DeltaTime);
 	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
 
 

@@ -20,110 +20,6 @@ void AFlockingBoid::BeginPlay()
 	
 }
 
-FVector AFlockingBoid::Alignment(TArray<AFlockingBoid*> Neighbours)
-{
-    if (Neighbours.Num() == 0) {
-        return FVector::ZeroVector;
-    }
-
-    FVector NewVelocity;
-    for (AFlockingBoid* Boid : Neighbours) {
-        NewVelocity += Boid->CurrentVelocity;
-    }
-    NewVelocity /= Neighbours.Num();
-    NewVelocity.Normalize();
-    return NewVelocity;
-}
-
-FVector AFlockingBoid::Cohesion(TArray<AFlockingBoid*> Neighbours)
-{
-    if (Neighbours.Num() == 0) {
-        return FVector::ZeroVector;
-    }
-
-    FVector CohesionPoint;
-
-    float InverseVal = 1 / Neighbours.Num();
-
-    for (AFlockingBoid* Boid : Neighbours) {
-        CohesionPoint += (Boid->GetActorLocation() * InverseVal);
-    }
-
-    return Seek(CohesionPoint);
-}
-
-FVector AFlockingBoid::Sepparation(TArray<AFlockingBoid*> Neighbours)
-{
-    if (Neighbours.Num() == 0) {
-        return FVector::ZeroVector;
-    }
-
-    FVector FleePoint;
-    float InverseVal = 1 / Neighbours.Num();
-    for (AFlockingBoid* Boid : Neighbours) {
-        FleePoint += Flee(Boid->GetActorLocation());
-    }
-    FleePoint.Normalize();
-    return FleePoint;
-}
-
-void AFlockingBoid::BoidSteering(TArray<AFlockingBoid*> Neighbours, float DeltaTime)
-{
-    FVector TargetVelocity = FVector::ZeroVector;
-    if (Neighbours.Num() == 0) {
-        bHasNeighbourhood = false;
-        TargetVelocity += CurrentVelocity;
-    }
-
-        bHasNeighbourhood = true;
-        FVector Alignment = FVector::ZeroVector;
-        FVector Cohesion = FVector::ZeroVector;
-        FVector Sepparation = FVector::ZeroVector;
-
-        for (AFlockingBoid* Boid : Neighbours) {
-            if (Boid == this) {
-                return;
-            }
-            FVector BoidLocation = Boid->GetActorLocation();
-
-            FVector Diff = BoidLocation - GetActorLocation();
-            float Distance = FVector().Distance(BoidLocation, GetActorLocation());
-
-            if (Distance != 0 && Distance < SeparationValue) {
-                Sepparation += Flee(BoidLocation);
-            }
-
-            if (Distance < FlockingBoidManager->NeighbourRadius) {
-                Cohesion += Diff;
-                Alignment += Boid->CurrentVelocity;
-            }
-        }
-        Sepparation.Normalize();
-        TargetVelocity += Sepparation * FlockingBoidManager->SeparationWeight;
-        TargetVelocity += (Alignment / Neighbours.Num()) * FlockingBoidManager->AllignmentWeight;
-        TargetVelocity += Seek(Cohesion * FlockingBoidManager->CohesionWeight);
-
-        // Constrain boid within the sphere
-        TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
-
-        FVector NewForce = TargetVelocity - CurrentVelocity;
-        CurrentVelocity += NewForce * DeltaTime;
-        // Cap the velocity to the maximum allowed speed
-        CurrentVelocity = CurrentVelocity.GetClampedToMaxSize(Speed);
-
-        FVector Location = GetActorLocation();
-        Location += (CurrentVelocity * Speed * DeltaTime);
-        SetActorLocation(Location);
-
-        if (!CurrentVelocity.IsNearlyZero()) // Avoid rotating when velocity is zero
-        {
-            FRotator NewRotation = CurrentVelocity.Rotation();
-            SetActorRotation(NewRotation);
-        }
-   
-    
-}
-
 FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold)
 {
     FVector ToCenter = SphereCenter - GetActorLocation();
@@ -197,47 +93,86 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
 {
     //FVector TargetVelocity = FVector::ZeroVector;
 
-    TArray<AFlockingBoid*> BoidNeighbourhood = FlockingBoidManager->GetBoidNeighbourhood(this);
-    BoidSteering(BoidNeighbourhood, DeltaTime);
-    //if (BoidNeighbourhood.Num() > 0) {
-    //    bHasNeighbourhood = true;
-    //    if (TargetVelocity.Size() < 1.0f) {
-    //        TargetVelocity += Sepparation(BoidNeighbourhood) * FlockingBoidManager->SeparationWeight;
-    //    }
-    //    if (TargetVelocity.Size() < 1.0f) {
-    //        TargetVelocity += Cohesion(BoidNeighbourhood) * FlockingBoidManager->CohesionWeight;
-    //    }
-    //    if (TargetVelocity.Size() < 1.0f) {
-    //        TargetVelocity += Alignment(BoidNeighbourhood) * FlockingBoidManager->AllignmentWeight;
-    //    }
-    //    TargetVelocity.Normalize();
+    TArray<AFlockingBoid*> Neighbours = FlockingBoidManager->GetBoidNeighbourhood(this);
 
-    //    /*if (TargetVelocity.Size() < 1.0f) {
-    //        TargetVelocity += Wander(100.0f, 200.0f, 10.0f);
-    //        TargetVelocity.Normalize();
-    //    }*/
-    //}
-    //else {
-    //    bHasNeighbourhood = false;
-    //    TargetVelocity += CurrentVelocity;
-    //}
-    //
-    ////Wanders
-    //    
+    if (Neighbours.Num() == 0)
+    {
+        bHasNeighbourhood = false;
+        return;
+    }
 
-    //// Constrain boid within the sphere
-    //TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
+    bHasNeighbourhood = true;
 
-    //FVector NewForce = TargetVelocity - CurrentVelocity;
-    //CurrentVelocity += NewForce * DeltaTime;
+    // Initialize forces
+    FVector AlignmentForce = FVector::ZeroVector;
+    FVector CohesionForce = FVector::ZeroVector;
+    FVector SeparationForce = FVector::ZeroVector;
 
-    //FVector Location = GetActorLocation();
-    //Location += (CurrentVelocity * Speed * DeltaTime);
-    //SetActorLocation(Location);
+    // Iterate through neighbors
+    for (AFlockingBoid* Boid : Neighbours)
+    {
+        if (Boid == this) continue;
 
-    //if (!CurrentVelocity.IsNearlyZero()) // Avoid rotating when velocity is zero
-    //{
-    //    FRotator NewRotation = CurrentVelocity.Rotation();
-    //    SetActorRotation(NewRotation);
-    //}
+        FVector Diff = Boid->GetActorLocation() - GetActorLocation();
+        float Distance = Diff.Size();
+
+        // Separation force
+        if (Distance > 0 && Distance < SeparationValue)
+        {
+            SeparationForce += (-Diff / Distance); // Invert and scale by distance
+        }
+
+        // Cohesion and Alignment within Neighbor Radius
+        if (Distance < FlockingBoidManager->NeighbourRadius)
+        {
+            CohesionForce += Diff;                // Cohesion: move towards neighbors
+            AlignmentForce += Boid->CurrentVelocity; // Alignment: match neighbors' velocity
+        }
+    }
+
+    // Normalize forces and scale by weights
+    if (!SeparationForce.IsNearlyZero())
+    {
+        SeparationForce.Normalize();
+        SeparationForce *= FlockingBoidManager->SeparationWeight;
+    }
+
+    if (!AlignmentForce.IsNearlyZero())
+    {
+        AlignmentForce /= Neighbours.Num(); // Average alignment
+        AlignmentForce.Normalize();
+        AlignmentForce *= FlockingBoidManager->AllignmentWeight;
+    }
+
+    if (!CohesionForce.IsNearlyZero())
+    {
+        CohesionForce.Normalize();
+        CohesionForce *= FlockingBoidManager->CohesionWeight;
+    }
+
+    // Combine forces
+    FVector TargetVelocity = SeparationForce + AlignmentForce + CohesionForce;
+
+    // Set sphere boundary for boids
+    TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
+
+    // Cap velocity to max speed
+    TargetVelocity = TargetVelocity.GetClampedToMaxSize(Speed);
+
+
+    // Apply new force
+    FVector NewForce = TargetVelocity - CurrentVelocity;
+    CurrentVelocity += NewForce * DeltaTime;
+
+    // Update position
+    FVector NewLocation = GetActorLocation() + (CurrentVelocity * Speed * DeltaTime);
+    SetActorLocation(NewLocation);
+
+    // Update rotation
+    if (!CurrentVelocity.IsNearlyZero())
+    {
+        FRotator NewRotation = CurrentVelocity.Rotation();
+        SetActorRotation(NewRotation);
+    }
+
 }
