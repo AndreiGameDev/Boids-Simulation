@@ -21,6 +21,10 @@
 		{
 			"Name": "VisualStudioTools",
 			"Enabled": true
+		},
+		{
+			"Name": "HDRIBackdrop",
+			"Enabled": true
 		}
 	]
 }
