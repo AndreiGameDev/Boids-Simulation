@@ -20,7 +20,6 @@ void AFlockingBoid::BeginPlay()
 	
 }
 
-// Constraints boid movement within a sphere boundary.
 FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold)
 {
     FVector ToCenter = SphereCenter - GetActorLocation();
@@ -42,7 +41,6 @@ FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVec
     return CurrentActorVelocity.GetClampedToMaxSize(Speed);
 }
 
-// Debugs neighbour hood radius by displaying a sphere around the boid.
 void AFlockingBoid::DebugNeighbourRadius()
 {
     //Debugging neighbour area
@@ -69,12 +67,9 @@ void AFlockingBoid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    if (FlockingBoidManager->bDebugNeighbourHood) {
-        DebugNeighbourRadius();
-    }
+    
     
 }
-
 FVector AFlockingBoid::Seek(FVector Position)
 {
 	FVector NewVelocity = Position - GetActorLocation();

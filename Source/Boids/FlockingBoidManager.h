@@ -35,6 +35,14 @@ struct FBoidManagerProperties
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
 	float EdgeThreshold;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	bool bDebugBoundary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	bool bDebugEdgeTreshhold;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	bool bDebugNeighbourHood;
 	// Default constructor for initialization
 	FBoidManagerProperties()
 		: SpawnCount(30)
@@ -45,6 +53,9 @@ struct FBoidManagerProperties
 		, AllignmentWeight(1.0f)
 		, SphereRadius(1000.0f)
 		, EdgeThreshold(100.0f)
+		, bDebugBoundary(true)
+		, bDebugEdgeTreshhold(true)
+		, bDebugNeighbourHood(false)
 	{
 	}
 };
@@ -97,6 +108,8 @@ public:
 	bool bDebugBoundary = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
 	bool bDebugEdgeTreshhold = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
+	bool bDebugNeighbourHood = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Boid Manager Settings", meta = (DisplayName = "Set Boid Manager Properties Struct", ToolTip = "Sets all boid manager properties using a single struct."))
 	void SetProperties(const FBoidManagerProperties& NewProperties);

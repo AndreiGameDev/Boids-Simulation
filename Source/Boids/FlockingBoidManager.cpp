@@ -89,6 +89,9 @@ void AFlockingBoidManager::SetProperties(const FBoidManagerProperties& NewProper
     AllignmentWeight = NewProperties.AllignmentWeight;
     SphereRadius = NewProperties.SphereRadius;
     EdgeThreshold = NewProperties.EdgeThreshold;
+    bDebugBoundary = NewProperties.bDebugBoundary;
+    bDebugEdgeTreshhold = NewProperties.bDebugEdgeTreshhold;
+    bDebugNeighbourHood = NewProperties.bDebugNeighbourHood;
 }
 
 FBoidManagerProperties AFlockingBoidManager::GetProperties()
@@ -103,6 +106,9 @@ FBoidManagerProperties AFlockingBoidManager::GetProperties()
     Properties.AllignmentWeight = AllignmentWeight;
     Properties.SphereRadius = SphereRadius;
     Properties.EdgeThreshold = EdgeThreshold;
+    Properties.bDebugBoundary = bDebugBoundary;
+    Properties.bDebugEdgeTreshhold = bDebugEdgeTreshhold;
+    Properties.bDebugNeighbourHood = bDebugNeighbourHood;
 
     return Properties;
 }
