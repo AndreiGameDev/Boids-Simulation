@@ -41,10 +41,8 @@ FVector AFlockingBoid::ApplySphereConstraints(FVector CurrentActorVelocity, FVec
     return CurrentActorVelocity.GetClampedToMaxSize(Speed);
 }
 
-// Called every frame
-void AFlockingBoid::Tick(float DeltaTime)
+void AFlockingBoid::DebugNeighbourRadius()
 {
-	Super::Tick(DeltaTime);
     //Debugging neighbour area
     if (bHasNeighbourhood) {
         DrawDebugSphere(GetWorld(),
@@ -52,8 +50,9 @@ void AFlockingBoid::Tick(float DeltaTime)
             FlockingBoidManager->NeighbourRadius,
             8,
             FColor::Green,
-            false, -1.0f, 0, 1.0f ); 
-    } else {
+            false, -1.0f, 0, 1.0f);
+    }
+    else {
         DrawDebugSphere(GetWorld(),
             GetActorLocation(),
             FlockingBoidManager->NeighbourRadius,
@@ -61,6 +60,14 @@ void AFlockingBoid::Tick(float DeltaTime)
             FColor::Red,
             false, -1.0f, 0, 1.0f);
     }
+}
+
+// Called every frame
+void AFlockingBoid::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+    
     
 }
 FVector AFlockingBoid::Seek(FVector Position)

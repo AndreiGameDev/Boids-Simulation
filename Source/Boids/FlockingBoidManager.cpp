@@ -33,22 +33,26 @@ void AFlockingBoidManager::BeginPlay()
 void AFlockingBoidManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    // Draws the edge of the sphere
-    DrawDebugSphere(GetWorld(),
-        SphereCenter,
-        SphereRadius,
-        32,
-        FColor::Blue,
-        false, -1.0f, 0, 1.0f
-    );
-    // Draws the sphere of how far from the edge the boids should turn
-    DrawDebugSphere(GetWorld(),               
-        SphereCenter,             
-        SphereRadius - EdgeThreshold,             
-        32,                       
-        FColor::Yellow,             
-        false,-1.0f,0,1.0f                      
-    );
+    if (bDebugBoundary) {
+        // Draws the edge of the sphere
+        DrawDebugSphere(GetWorld(),
+            SphereCenter,
+            SphereRadius,
+            32,
+            FColor::Blue,
+            false, -1.0f, 0, 1.0f
+        );
+    }
+    if (bDebugEdgeTreshhold) {
+        // Draws the sphere of how far from the edge the boids should turn
+        DrawDebugSphere(GetWorld(),
+            SphereCenter,
+            SphereRadius - EdgeThreshold,
+            32,
+            FColor::Yellow,
+            false, -1.0f, 0, 1.0f
+        );
+    }
 
 	for (AFlockingBoid* Boid : MyBoids) {
 		Boid->UpdateBoid(DeltaTime);
@@ -83,6 +87,8 @@ void AFlockingBoidManager::SetProperties(const FBoidManagerProperties& NewProper
     SeparationWeight = NewProperties.SeparationWeight;
     CohesionWeight = NewProperties.CohesionWeight;
     AllignmentWeight = NewProperties.AllignmentWeight;
+    SphereRadius = NewProperties.SphereRadius;
+    EdgeThreshold = NewProperties.EdgeThreshold;
 }
 
 FBoidManagerProperties AFlockingBoidManager::GetProperties()
@@ -95,6 +101,8 @@ FBoidManagerProperties AFlockingBoidManager::GetProperties()
     Properties.SeparationWeight = SeparationWeight;
     Properties.CohesionWeight = CohesionWeight;
     Properties.AllignmentWeight = AllignmentWeight;
+    Properties.SphereRadius = SphereRadius;
+    Properties.EdgeThreshold = EdgeThreshold;
 
     return Properties;
 }

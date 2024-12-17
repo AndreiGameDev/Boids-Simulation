@@ -38,6 +38,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	float Speed = 100.0f;
+private:
+	void DebugNeighbourRadius();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

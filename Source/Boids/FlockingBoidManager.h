@@ -29,6 +29,12 @@ struct FBoidManagerProperties
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
 	float AllignmentWeight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float SphereRadius;   
+                
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Manager Settings")
+	float EdgeThreshold;
+
 	// Default constructor for initialization
 	FBoidManagerProperties()
 		: SpawnCount(30)
@@ -37,6 +43,8 @@ struct FBoidManagerProperties
 		, SeparationWeight(1.0f)
 		, CohesionWeight(1.0f)
 		, AllignmentWeight(1.0f)
+		, SphereRadius(1000.0f)
+		, EdgeThreshold(100.0f)
 	{
 	}
 };
@@ -76,12 +84,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	TArray<class AFlockingBoid*> MyBoids;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
+	bool bNeighbourRadius = false;
+
 	FVector SphereCenter = GetActorLocation(); // Center of the sphere
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
 	float SphereRadius = 1000.0f;                     // Radius of the sphere
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
 	float EdgeThreshold = 100.0f;                     // Threshold for edge avoidance
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
+	bool bDebugBoundary = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boundary Settings")
+	bool bDebugEdgeTreshhold = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Boid Manager Settings", meta = (DisplayName = "Set Boid Manager Properties Struct", ToolTip = "Sets all boid manager properties using a single struct."))
 	void SetProperties(const FBoidManagerProperties& NewProperties);
@@ -89,6 +104,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Boid Manager Settings", meta = (DisplayName = "Get Boid Manager Properties Struct", ToolTip = "Gets all boid manager properties using a single struct."))
 	FBoidManagerProperties GetProperties();
 
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
