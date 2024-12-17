@@ -74,42 +74,42 @@ void AFlockingBoid::Tick(float DeltaTime)
     }
     
 }
-
 FVector AFlockingBoid::Seek(FVector Position)
 {
-	FVector NewVelocity = Position - GetActorLocation();
-	NewVelocity.Normalize();
-	return NewVelocity;
+    FVector NewVelocity = Position - GetActorLocation();
+    NewVelocity.Normalize();
+    return NewVelocity;
 }
 
-FVector AFlockingBoid::Flee(FVector Position)
-{
-	FVector NewVelocity = GetActorLocation() - Position;
-	NewVelocity.Normalize();
-	return NewVelocity;
-}
-
-FVector AFlockingBoid::Wander(float Radius, float Distance, float Jitter)
-{
-    FVector MyLocation = GetActorLocation();
-    if (FVector::Dist(MyLocation, WanderDestination) < 100.0f) {
-        FVector ProjectedPosition = MyLocation + (GetActorForwardVector() * Distance);
-
-        WanderDestination = ProjectedPosition + (FMath::Rand() * FMath::RandRange(0.0f, Jitter));
-    }
-
-    FVector JitterDestination = Seek(WanderDestination) + (FMath::VRand() * FMath::RandRange(0.0f, Jitter));
-    return JitterDestination;
-}
 void AFlockingBoid::UpdateBoid(float DeltaTime)
 {
-    //FVector TargetVelocity = FVector::ZeroVector;
-
     TArray<AFlockingBoid*> Neighbours = FlockingBoidManager->GetBoidNeighbourhood(this);
 
     if (Neighbours.Num() == 0)
     {
         bHasNeighbourhood = false;
+        FVector TargetVelocity = Seek(FlockingBoidManager->GetClosestBoidPosition(this));
+        // Set sphere boundary for boids
+        TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
+
+        // Cap velocity to max speed
+        TargetVelocity = TargetVelocity.GetClampedToMaxSize(Speed);
+
+
+        // Apply new force
+        FVector NewForce = TargetVelocity - CurrentVelocity;
+        CurrentVelocity += NewForce * DeltaTime;
+
+        // Update position
+        FVector NewLocation = GetActorLocation() + (CurrentVelocity * Speed * DeltaTime);
+        SetActorLocation(NewLocation);
+
+        // Update rotation
+        if (!CurrentVelocity.IsNearlyZero())
+        {
+            FRotator NewRotation = CurrentVelocity.Rotation();
+            SetActorRotation(NewRotation);
+        }
         return;
     }
 

@@ -28,8 +28,14 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
 	FVector Seek(FVector Position);
+	FVector Flee(FVector Position);
+
+	FVector Wander(float Radius, float Distance, float Jitter);
+	FVector WanderDestination;
+	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	float Speed = 100.0f;
 private:
