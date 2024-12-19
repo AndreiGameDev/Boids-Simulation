@@ -38,7 +38,6 @@ protected:
 	virtual void BeginPlay() override;
 	FVector ApplySphereConstraints(FVector CurrentActorVelocity, FVector SphereCenter, float SphereRadius, float EdgeThreshold);
 	FVector Seek(FVector Position);
-	FVector Flee(FVector Position);
 	FVector CollisionAvoidance();
 	TArray<FHitResult> Hits;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")

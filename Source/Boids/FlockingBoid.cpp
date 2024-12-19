@@ -86,38 +86,65 @@ FVector AFlockingBoid::Seek(FVector Position)
 
 FVector AFlockingBoid::CollisionAvoidance()
 {
-    
+    FVector AvoidanceForce = FVector::ZeroVector;
+    FVector AvoidDirection = FVector::ZeroVector;
+
+    // Set up debug trace type based on the manager's setting
     EDrawDebugTrace::Type TraceType = EDrawDebugTrace::None;
-    if (FlockingBoidManager->bDebugObjectAvoidance) {
+    if (FlockingBoidManager->bDebugObjectAvoidance)
+    {
         TraceType = EDrawDebugTrace::ForOneFrame;
     }
-    
-    bool bHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), GetActorLocation(),
-        GetActorLocation() + CurrentVelocity * ObjectAvoidanceRange,
+
+    // Perform a sphere trace to detect obstacles in the boid's path
+    TArray<FHitResult> HitResults;
+    bool bHit = UKismetSystemLibrary::SphereTraceMulti(
+        GetWorld(),
+        GetActorLocation(),
+        GetActorLocation() + CurrentVelocity.GetSafeNormal() * ObjectAvoidanceRange,
         ObjectAvoidanceRadius,
-        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Camera), true,
+        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), // Change to appropriate trace channel
+        true,
         FlockingBoidManager->IgnoreBoidsArray,
         TraceType,
-        Hits,
-        true, 
+        HitResults,
+        true,
         FLinearColor::Green,
         FLinearColor::Red);
 
-    if (bHit) {
-        float Distance = FVector::Distance(GetActorLocation(), Hits[0].Location);
-        FVector AvoidanceLocation = Flee(Hits[0].Location + Distance);
-        UE_LOG(LogTemp, Warning, TEXT("Colision Avoidance Vector %s"), AvoidanceLocation.ToString());
-        return AvoidanceLocation.GetClampedToMaxSize(Speed);
+    if (bHit)
+    {
+        int32 NumHits = HitResults.Num();
+        int32 ValidHits = 0;
+
+        for (const FHitResult& Hit : HitResults)
+        {
+            if (Hit.bBlockingHit)
+            {
+                // Calculate direction away from hit location (obstacle center)
+                FVector ToHit = GetActorLocation() - Hit.ImpactPoint;
+                AvoidDirection += ToHit.GetSafeNormal(); // Accumulate avoidance directions
+                ValidHits++;
+            }
+        }
+
+        if (ValidHits > 0)
+        {
+            // Average out the avoidance direction
+            AvoidDirection /= ValidHits;
+
+            // Apply a force to steer the boid away from obstacles
+            AvoidanceForce = AvoidDirection.GetSafeNormal() * 1.5f; // AvoidanceStrength determines the push intensity
+
+            // Log for debugging
+            UE_LOG(LogTemp, Warning, TEXT("AvoidanceForce: %s"), *AvoidanceForce.ToString());
+        }
     }
-        return FVector::Zero();
+
+    // Return the combined avoidance force clamped to speed
+    return AvoidanceForce;
 }
 
-FVector AFlockingBoid::Flee(FVector Position)
-{
-    FVector NewVelocity = GetActorLocation() - Position;
-    NewVelocity.Normalize();
-    return NewVelocity;
-}
 // Steering and the constraining of the boid happens here.
 void AFlockingBoid::UpdateBoid(float DeltaTime)
 {
@@ -194,14 +221,8 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
     FVector CollisionAvoidanceForce = CollisionAvoidance();
     // Combine forces
     FVector TargetVelocity = FVector::ZeroVector;
-    if (!CollisionAvoidanceForce.IsNearlyZero()) {
-        // Prioritize collision avoidance with a higher weight
-        TargetVelocity = CollisionAvoidanceForce * 1.0f;
-        TargetVelocity += (SeparationForce + AlignmentForce + CohesionForce) * 1.0f; // Reduce other forces
-    }
-    else {
-        TargetVelocity = SeparationForce + AlignmentForce + CohesionForce;
-    }
+        TargetVelocity = CollisionAvoidanceForce;
+        TargetVelocity += (SeparationForce + AlignmentForce + CohesionForce); // Reduce other forces
 
     // Set sphere boundary for boids
     TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
