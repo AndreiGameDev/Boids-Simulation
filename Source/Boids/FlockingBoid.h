@@ -9,15 +9,14 @@
 class AFlockingBoidManager;
 
 UCLASS()
-class BOIDS_API AFlockingBoid : public AActor
-{
+class BOIDS_API AFlockingBoid : public AActor {
 	GENERATED_BODY()
-	
+
 	FVector CurrentVelocity = FVector::ZeroVector;
 	bool bHasNeighbourhood = false;
 
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AFlockingBoid();
 
@@ -44,7 +43,7 @@ protected:
 	float Speed = 100.0f;
 private:
 	void DebugNeighbourRadius();
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void UpdateBoid(float DeltaTime);
