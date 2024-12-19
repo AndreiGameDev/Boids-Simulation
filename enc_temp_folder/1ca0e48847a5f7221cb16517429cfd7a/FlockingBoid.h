@@ -31,8 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	float ObjectAvoidanceRadius = 50;
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,7 +38,6 @@ protected:
 	FVector Seek(FVector Position);
 	FVector Flee(FVector Position);
 	FVector CollisionAvoidance();
-	TArray<FHitResult> Hits;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boid Settings")
 	float Speed = 100.0f;
 private:

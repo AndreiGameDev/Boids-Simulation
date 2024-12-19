@@ -18,15 +18,7 @@ AFlockingBoidManager::AFlockingBoidManager()
 void AFlockingBoidManager::BeginPlay()
 {
 	Super::BeginPlay();
-    // Spawning of boids
-	for (int i = 0; i < SpawnCount; i++) {
-		FVector SpawnLocation = (FMath::VRand() * FMath::RandRange(0.0f, SpawnRadius)) + GetActorLocation();
-		FRotator SpawnRotation = GetActorRotation();
-
-		AFlockingBoid* NewBoid = GetWorld()->SpawnActor<AFlockingBoid>(BBoid, SpawnLocation, SpawnRotation);
-		NewBoid->FlockingBoidManager = this;
-		MyBoids.Add(NewBoid);
-	}
+    
 
 }
 
@@ -60,6 +52,7 @@ void AFlockingBoidManager::Tick(float DeltaTime)
 	}
 }
 
+// Grabs every boid within a certain range and creates a neighbourhood.
 TArray<class AFlockingBoid*> AFlockingBoidManager::GetBoidNeighbourhood(AFlockingBoid* ThisBoid)
 {
     TArray<class AFlockingBoid*> ReturnBoids;
@@ -95,6 +88,7 @@ void AFlockingBoidManager::SetProperties(const FBoidManagerProperties& NewProper
     bDebugNeighbourHood = NewProperties.bDebugNeighbourHood;
 }
 
+
 FBoidManagerProperties AFlockingBoidManager::GetProperties()
 {
     FBoidManagerProperties Properties;
@@ -114,6 +108,35 @@ FBoidManagerProperties AFlockingBoidManager::GetProperties()
     return Properties;
 }
 
+// Spawns every boid according to spawn count
+void AFlockingBoidManager::SpawnBoids(bool& BDebugOutput, FString& DebugOutputText)
+{
+    for (int i = 0; i < SpawnCount; i++) {
+        FVector SpawnLocation = (FMath::VRand() * FMath::RandRange(0.0f, SpawnRadius)) + GetActorLocation();
+        FRotator SpawnRotation = GetActorRotation();
+
+        AFlockingBoid* NewBoid = GetWorld()->SpawnActor<AFlockingBoid>(BBoid, SpawnLocation, SpawnRotation);
+        NewBoid->FlockingBoidManager = this;
+        MyBoids.Add(NewBoid);
+        IgnoreBoidsArray.Add(NewBoid);
+    }
+    BDebugOutput = true;
+    DebugOutputText = FString::Printf(TEXT("Initialised %d boids"), MyBoids.Num());
+}
+
+// Destroys the boids then empties the array.
+void AFlockingBoidManager::DespawnBoids(bool& BDebugOutput, FString& DebugOutputText)
+{
+    for (AFlockingBoid* Boid : MyBoids) {
+        Boid->Destroy();
+    }
+    MyBoids.Empty();
+    IgnoreBoidsArray.Empty();
+    BDebugOutput = true;
+    DebugOutputText = FString::Printf(TEXT("Destroyed every boid, Myboids count is at %f"), MyBoids.Num());
+}
+
+// Itterates through every boid and compares distances to find the closest boid position compared to the boid fed into the function.
 FVector AFlockingBoidManager::GetClosestBoidPosition(AFlockingBoid* ThisBoid, bool bDebugPrint)
 {
     FVector ReturnVal = FVector::ZeroVector;

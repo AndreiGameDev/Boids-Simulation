@@ -86,30 +86,29 @@ FVector AFlockingBoid::Seek(FVector Position)
 
 FVector AFlockingBoid::CollisionAvoidance()
 {
-    
+    TArray<FHitResult> Hits;
     EDrawDebugTrace::Type TraceType = EDrawDebugTrace::None;
     if (FlockingBoidManager->bDebugObjectAvoidance) {
         TraceType = EDrawDebugTrace::ForOneFrame;
     }
-    
     bool bHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), GetActorLocation(),
-        GetActorLocation() + CurrentVelocity * ObjectAvoidanceRange,
+        GetActorLocation() + ObjectAvoidanceRange,
         ObjectAvoidanceRadius,
         UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Camera), true,
         FlockingBoidManager->IgnoreBoidsArray,
         TraceType,
         Hits,
         true, 
-        FLinearColor::Green,
-        FLinearColor::Red);
-
+        FLinearColor::Blue);
     if (bHit) {
         float Distance = FVector::Distance(GetActorLocation(), Hits[0].Location);
-        FVector AvoidanceLocation = Flee(Hits[0].Location + Distance);
-        UE_LOG(LogTemp, Warning, TEXT("Colision Avoidance Vector %s"), AvoidanceLocation.ToString());
-        return AvoidanceLocation.GetClampedToMaxSize(Speed);
+        return Flee(Hits[0].Location + Distance);
     }
-        return FVector::Zero();
+    else {
+        return CurrentVelocity;
+    }
+
+    
 }
 
 FVector AFlockingBoid::Flee(FVector Position)
@@ -128,7 +127,7 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
     {
         bHasNeighbourhood = false;
         FVector TargetVelocity = CollisionAvoidance();
-        TargetVelocity += Seek(FlockingBoidManager->GetClosestBoidPosition(this));
+        TargetVelocity = Seek(FlockingBoidManager->GetClosestBoidPosition(this));
         TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
         TargetVelocity = TargetVelocity.GetClampedToMaxSize(Speed);
 
@@ -191,25 +190,12 @@ void AFlockingBoid::UpdateBoid(float DeltaTime)
         CohesionForce.Normalize();
         CohesionForce *= FlockingBoidManager->CohesionWeight;
     }
-    FVector CollisionAvoidanceForce = CollisionAvoidance();
+    FVector TargetVelocity = CollisionAvoidance();
     // Combine forces
-    FVector TargetVelocity = FVector::ZeroVector;
-    if (!CollisionAvoidanceForce.IsNearlyZero()) {
-        // Prioritize collision avoidance with a higher weight
-        TargetVelocity = CollisionAvoidanceForce * 1.0f;
-        TargetVelocity += (SeparationForce + AlignmentForce + CohesionForce) * 1.0f; // Reduce other forces
-    }
-    else {
-        TargetVelocity = SeparationForce + AlignmentForce + CohesionForce;
-    }
-
-    // Set sphere boundary for boids
+    TargetVelocity += SeparationForce + AlignmentForce + CohesionForce;
+    // Set sphere boundary for boids and cap the velocity
     TargetVelocity = ApplySphereConstraints(TargetVelocity, FlockingBoidManager->SphereCenter, FlockingBoidManager->SphereRadius, FlockingBoidManager->EdgeThreshold);
-
-    // Cap velocity to max speed
     TargetVelocity = TargetVelocity.GetClampedToMaxSize(Speed);
-
-    // Apply new force
     FVector NewForce = TargetVelocity - CurrentVelocity;
     CurrentVelocity += NewForce * DeltaTime;
     //Setting location and rotation
